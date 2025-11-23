@@ -1,0 +1,13 @@
+{
+	"name": "AIJimmy",
+	"version": "0.01.2",
+	"author": "ebe1.kenobi",
+	"description": "AIJimmy",
+	"dll": "TFModFortRiseAiJimmy.dll",
+	"dependencies": [
+		{
+			"name": "Loader AI",
+			"version": "0.0.2"
+		}
+	]
+}
