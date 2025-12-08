@@ -23,7 +23,7 @@ namespace TFModFortRiseAiGraph
         //Debugger.Launch(); // Proposera d’attacher Visual Studio
       }
       Instance = this;
-      Logger.Init("LOGAiSImple");
+      Logger.Init("LOGAiJimmy");
     }
 
     public override void LoadContent()
@@ -37,9 +37,14 @@ namespace TFModFortRiseAiGraph
       MyPlayer.Load();
       //MyVersusLevelSystem.Load();
       typeof(LoaderAIImport).ModInterop();
+      typeof(EigthPlayerImport).ModInterop();
       EightPlayerMod = IsModExists("WiderSetMod");
       PlayTagMod = IsModExists("PlayTag");
     }
+
+    //public static bool IsModExistsWiderSetMod() {
+    //  return RiseCore.IsModExists("WiderSetMod");
+    //}
 
     public override void Unload()
     {

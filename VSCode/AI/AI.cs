@@ -12,7 +12,7 @@ namespace TFModFortRiseAiGraph
 {
   internal class AI
   {
-    public const string AINAME = "AIJimmy";
+    public const string AINAME = "AIJIMMY";
     public static bool isAgentReady = false;
     //private static AISiAgentLevel0[] agents;
     //private static AISiAgentLevel1[] agents;
