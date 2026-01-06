@@ -2,19 +2,33 @@
 // + test solid dangereux (miasma/lave/spikeball)
 // + widerset compatible
 //=> ok correct
+// + pouvoir tirer a travers les trou (ok a l air de fonctionner)
+// + faire un random sur le temps enctre chaque arrow shoot
+// + ne pas s approcher des bomb trigger : todo
 // + ajout quest support : todo finir
-// + ajout team support  totest
+// + ajout team support  to test
 // + ajout trial support todo finir
 // + detection grabledge lock
 /////////////
-// todo prendre en compte type flexhe
+// + detection loop movement
+// todo prendre en compte type fleche  (test tail level 3 bomb arrow)
+    //public enum ArrowTypes
+    //{
+    //  Normal,
+    //  Bomb,
+    //  SuperBomb,
+    //  Laser,
+    //  Bramble,
+    //  Drill,
+    //  Bolt,
+    //  Feather,
+    //  Trigger,
+    //  Prism
+    //}
 // todo prendre en conmpte coffre
 // todo prendre en copte playtag mode
-// todo faire un random sur le temps enctre chaque arrow shoot
 // todo recuperer plus de une fleche ?
 // todo ajouter hyperjump et superjump
-
-
 //- center the player before action
 //- speed = 0 ?
 //- delete movex = 0 for each action whith speed = 0
@@ -22,13 +36,6 @@
 //- when arrow do not go at the enemy but go to a zone near him
 //- test catch multiple arrow
 // - problem avec dashup when the case the player is a cheval solid and not solid
-// - add hyper jump
-// - add super jump
-// prendre en compte les boule
-//prendre en compte les miasme
-//prendre en compte les bramble arrow
-//prendre en compte les bomb arrow et les trigger arrow
-//prendre en compte le wide screen 8 player
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,11 +106,14 @@ namespace TFModFortRiseAiGraph
     public const int SHOOT_COOLDOWN_FRAMES = 5;
     // Variables supplémentaires à mettre en haut de la classe
     public float shootCooldownTimer = 0f;
-    public const float SHOOT_COOLDOWN = 0.25f; // secondes entre deux tirs
+    public const float SHOOT_COOLDOWN_MIN = 0.10f;
+    public const float SHOOT_COOLDOWN_MAX = 0.50f;
+    public float nextShootCooldown = SHOOT_COOLDOWN_MIN;
     public const int MIN_X_SHOOT = 15; // portée minimale en X pour tirer
     public const int MIN_Y_SHOOT = 15; // portée minimale en Y pour tirer
     public const int MIN_X_DIAG_SHOOT = 17; // portée minimale en X pour tirer
     public const int MIN_Y_DIAG_SHOOT = 9; // portée minimale en Y pour tirer
+    private readonly Random rand = new Random();
 
     public const int ARROW_CATCH_RANGE = 1; // nombre de cases autour du joueur pour tenter le catch
 
@@ -304,6 +314,27 @@ namespace TFModFortRiseAiGraph
         currentPhaseIndex = 0;
       }
 
+      //test si ledgegrab ongoing (todo test)
+      if (playerInfo.GrabEdge &&
+          (currentAction == null ||
+          (currentAction.Name != "ledgegrableftout" && currentAction.Name != "ledgegrabrightout")))
+      {
+        Logger.Info("GrabEdge detecteeeeeeeeeeeeeeee");
+        string actionName = "";
+        if (playerInfo.Facing == Facing.Left) {
+          actionName = "ledgegrableftout";
+        } else {
+          actionName = "ledgegrabrightout";
+        }
+        currentAction = movementLibrary.Find(a => a.Name == actionName);
+        currentActions.Clear();
+        Logger.Info("currentAction  actionName : " + (currentAction != null ? currentAction.Name : "null"));
+      }
+      else
+      {
+        Logger.Info("pas GrabEdge");
+      }
+
       // === LANCER UNE NOUVELLE ACTION ===
       if (currentAction == null && currentActions.Count > 0)
       {
@@ -356,7 +387,7 @@ namespace TFModFortRiseAiGraph
       // === ACTION EN COURS ===
       if (currentAction != null)
       {
-        //Logger.Info("ExecuteActionPhases");
+        Logger.Info("ExecuteActionPhases " + currentAction.Name);
         ExecuteActionPhases(currentAction);
       }
     }
@@ -512,7 +543,7 @@ namespace TFModFortRiseAiGraph
 
       // Cooldown entre les tirs
       shootCooldownTimer += Engine.DeltaTime;
-      if (shootCooldownTimer < SHOOT_COOLDOWN && shootState == 0) return;
+      if (shootCooldownTimer < nextShootCooldown && shootState == 0) return;
 
       // Calcul direction vers l'ennemi
       Vector2 dir = enemy.Position - player.Position;
@@ -559,6 +590,7 @@ namespace TFModFortRiseAiGraph
         shootState = 1; // préparer le tir
         shootFrameCounter = 0;
         shootCooldownTimer = 0f; // reset cooldown
+        nextShootCooldown = RandomShootCooldown(); // nouveau délai pour le prochain tir
       }
 
       if (shootState == 1) // préparer
@@ -590,8 +622,81 @@ namespace TFModFortRiseAiGraph
       }
     }
 
-    // --- Méthode pour vérifier si le tir est possible sans mur ---
+    private float RandomShootCooldown()
+    {
+      double range = SHOOT_COOLDOWN_MAX - SHOOT_COOLDOWN_MIN;
+      return (float)(SHOOT_COOLDOWN_MIN + rand.NextDouble() * range);
+    }
+
+    // --- Méthode pour vérifier si une position est un trou (zone vide aux bords) ---
+    private bool IsPit(int x, int y)
+    {
+      if (x < 0 || y < 0 || x >= levelWidth || y >= levelHeight)
+        return false;
+
+      // Un trou est une zone vide (walkable) aux bords du niveau
+      // Trous horizontaux : aux bords gauche/droite
+      bool isHorizontalPit = (x == 0 || x == levelWidth - 1) && IsCellWalkable(x, y);
+      // Trous verticaux : aux bords haut/bas
+      bool isVerticalPit = (y == 0 || y == levelHeight - 1) && IsCellWalkable(x, y);
+
+      return isHorizontalPit || isVerticalPit;
+    }
+
+    // --- Méthode pour obtenir la position wrap correspondante à travers un trou ---
+    private List<Point> GetWrappedPositions(Point pos)
+    {
+      List<Point> wrapped = new List<Point>();
+      wrapped.Add(pos); // Position originale
+
+      // Wrap horizontal : trou à gauche <-> trou à droite
+      if (pos.X == 0 && IsPit(pos.X, pos.Y))
+      {
+        wrapped.Add(new Point(levelWidth - 1, pos.Y));
+      }
+      else if (pos.X == levelWidth - 1 && IsPit(pos.X, pos.Y))
+      {
+        wrapped.Add(new Point(0, pos.Y));
+      }
+
+      // Wrap vertical : trou en haut <-> trou en haut (même Y)
+      if (pos.Y == 0 && IsPit(pos.X, pos.Y))
+      {
+        wrapped.Add(new Point(pos.X, levelHeight - 1));
+      }
+      else if (pos.Y == levelHeight - 1 && IsPit(pos.X, pos.Y))
+      {
+        wrapped.Add(new Point(pos.X, 0));
+      }
+
+      return wrapped;
+    }
+
+    // --- Méthode pour vérifier si le tir est possible sans mur (avec support des trous) ---
     private bool CanShootLineOfSight(Point start, Point end)
+    {
+      // Essayer le chemin direct
+      if (CanShootLineOfSightDirect(start, end))
+        return true;
+
+      // Essayer les chemins à travers les trous (wrap)
+      List<Point> startWrapped = GetWrappedPositions(start);
+      List<Point> endWrapped = GetWrappedPositions(end);
+
+      foreach (Point startWrap in startWrapped)
+      {
+        foreach (Point endWrap in endWrapped)
+        {
+          if (CanShootLineOfSightDirect(startWrap, endWrap))
+            return true;
+        }
+      }
+
+      return false;
+    }
+
+    // --- Méthode pour vérifier la ligne de visée directe (sans wrap) ---
+    private bool CanShootLineOfSightDirect(Point start, Point end)
     {
       int x0 = start.X;
       int y0 = start.Y;
@@ -607,7 +712,12 @@ namespace TFModFortRiseAiGraph
       while (true)
       {
         // Vérifie la cellule actuelle
-        if (!IsCellWalkable(x0, y0)) return false;
+        // Appliquer le wrap pour obtenir les coordonnées valides
+        int checkX = (x0 + levelWidth) % levelWidth;
+        int checkY = (y0 + levelHeight) % levelHeight;
+
+        // Si on traverse un mur solide, le tir est bloqué
+        if (IsSolid(checkX, checkY)) return false;
 
         if (x0 == x1 && y0 == y1) break;
 
@@ -788,8 +898,8 @@ namespace TFModFortRiseAiGraph
         Node current = open[0];
         open.RemoveAt(0);
 
-        // Objectif atteint
-        if (current.Position.Equals(goal))
+        // Objectif atteint (y compris via wraps)
+        if (IsGoalReached(current.Position, goal))
         {
           var foundPath = ReconstructPath(current);
           this.debugPath = foundPath != null ? new List<Point>(foundPath) : new List<Point>();
@@ -824,7 +934,7 @@ namespace TFModFortRiseAiGraph
             if (d.X < 0 || d.X >= levelWidth || d.Y < 0 || d.Y >= levelHeight)
               continue;
 
-            // ===== OPTION 1 : tester la position en l’air =====
+            // ===== OPTION 1 : tester la position en l'air =====
             TryAddNode(current, d, move, open, closed, goal);
 
             // ===== OPTION 2 : tester la chute =====
@@ -832,6 +942,26 @@ namespace TFModFortRiseAiGraph
             {
               Point fallPos = SimulateFall(d);
               TryAddNode(current, fallPos, move, open, closed, goal);
+            }
+
+            // ===== OPTION 3 : tester les wraps à travers les trous =====
+            List<Point> wrappedDests = GetWrappedPositions(d);
+            foreach (Point wrappedDest in wrappedDests)
+            {
+              if (wrappedDest.Equals(d)) continue; // Déjà testé
+
+              // Vérifier que c'est un trou valide
+              if (IsPit(wrappedDest.X, wrappedDest.Y))
+              {
+                TryAddNode(current, wrappedDest, move, open, closed, goal);
+
+                // Tester aussi la chute depuis la position wrap
+                if (!HasGroundBelow(wrappedDest.X, wrappedDest.Y))
+                {
+                  Point fallPosWrap = SimulateFall(wrappedDest);
+                  TryAddNode(current, fallPosWrap, move, open, closed, goal);
+                }
+              }
             }
 
             //if (!HasGroundBelow(d.X, d.Y)) d = SimulateFall(d); //todo sometime i don t want to fall but stay in air
@@ -910,19 +1040,50 @@ namespace TFModFortRiseAiGraph
     }
 
 
+    // --- Vérifie si l'objectif est atteint (y compris via wraps) ---
+    private bool IsGoalReached(Point current, Point goal)
+    {
+      // Vérification directe
+      if (current.Equals(goal))
+        return true;
+
+      // Vérification via wraps
+      List<Point> currentWrapped = GetWrappedPositions(current);
+      List<Point> goalWrapped = GetWrappedPositions(goal);
+
+      foreach (Point cw in currentWrapped)
+      {
+        foreach (Point gw in goalWrapped)
+        {
+          if (cw.Equals(gw))
+            return true;
+        }
+      }
+
+      return false;
+    }
+
     private float Heuristic(Point a, Point b)
     {
-      int dx = Math.Abs(a.X - b.X);
-      int dy = Math.Abs(a.Y - b.Y);
+      // Calculer la distance minimale en tenant compte des wraps
+      int dx = Math.Min(Math.Abs(a.X - b.X), levelWidth - Math.Abs(a.X - b.X));
+      int dy = Math.Min(Math.Abs(a.Y - b.Y), levelHeight - Math.Abs(a.Y - b.Y));
 
       // Favoriser les mouvements vers le haut (la cible est souvent au-dessus)
       // Si la cible est au-dessus, pénaliser moins les mouvements verticaux
-      if (b.Y < a.Y) // cible au-dessus
+      int deltaY = b.Y - a.Y;
+      // Ajuster pour le wrap vertical
+      if (Math.Abs(deltaY) > levelHeight / 2)
+      {
+        deltaY = deltaY > 0 ? deltaY - levelHeight : deltaY + levelHeight;
+      }
+
+      if (deltaY < 0) // cible au-dessus
       {
         // Réduire le coût des mouvements verticaux vers le haut
         return dx + (dy * 0.8f); // pénalité réduite pour monter
       }
-      else if (b.Y > a.Y) // cible en dessous
+      else if (deltaY > 0) // cible en dessous
       {
         // Les mouvements vers le bas sont plus faciles (gravité)
         return dx + (dy * 0.6f);
@@ -955,27 +1116,10 @@ namespace TFModFortRiseAiGraph
     void UpdatePerception()
     {
       UpdateLevelGrid();
-      //UpdateMiasmaGrid();
-      //Lava
-      //Miasma
-      //MoonGlassBlock
-      //MovingPlatform
-      //ProximityBlock
-      //ShiftBlock
-      //Spikeball
-      //SwitchBlock
       //TreasureChest
-      //UpdateMovingBlockGrid();   // CrackedPlatform  CrackedWall  CrumbleBlock CrumbleWall  GraniteBlock  LoopPlatform
       //JumpPad
-      //UpdatePlatformTraversableGrid();
-      //DebugPrintGrid();
       int playerIndex = index;
-      player = level.GetPlayer(index); //todo check
-                                       //search first enemy
-                                       //int enemyIndex = index == 0 ? 1 : 0;
-                                       //enemy = level.GetPlayer(index == 0 ? 1 : 0);  //todo , test for 2 players only
-
-
+      player = level.GetPlayer(index);
       /// ---Trouver l’ennemi le plus proche parmi tous les joueurs ---
       enemy = null;
       float bestDist = float.MaxValue;
@@ -985,7 +1129,7 @@ namespace TFModFortRiseAiGraph
         foreach (var entity in level.Layers[0].Entities){
 
           if (entity == null) continue;
-          if (!(entity is Enemy)) continue;   
+          if (!(entity is Enemy)) continue;
 
           // distance en cases (Manhattan)
           Point pc = WorldToCell(entity.Position);
@@ -1008,7 +1152,7 @@ namespace TFModFortRiseAiGraph
           // distance en cases (Manhattan)
           Point pc = WorldToCell(entity.Position);
           float dist = Math.Abs(pc.X - playerInfo.X) + Math.Abs(pc.Y - playerInfo.Y);
-          //levelGrid[pc.Y, pc.X] = 9;
+          levelGrid[pc.Y, pc.X] = 0; //sometime dummy are solid
           //Logger.Info($"{pc.Y}, {pc.X}");
 
 
@@ -1108,6 +1252,21 @@ namespace TFModFortRiseAiGraph
         Point cell = WorldToCell(arrow.Position);
         arrowInfo.X = cell.X;
         arrowInfo.Y = cell.Y;
+        arrowInfo.isCollectible = arrow.IsCollectible;
+        arrowInfo.type = arrow.ArrowType;
+        //public enum ArrowTypes
+        //{
+        //  Normal,
+        //  Bomb,
+        //  SuperBomb,
+        //  Laser,
+        //  Bramble,
+        //  Drill,
+        //  Bolt,
+        //  Feather,
+        //  Trigger,
+        //  Prism
+        //}
         arrows.Add(arrowInfo);
       }
     }

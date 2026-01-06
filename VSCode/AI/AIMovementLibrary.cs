@@ -940,7 +940,8 @@ namespace TFModFortRiseAiGraph
           .AddPhase(new MovementPhase(0.5f, jump: true, moveX: -1));  // ne pas bouger
       action.CalculateCost();
       action.Condition = (pos, ai) => agent.IsSolid(pos.X - 1, pos.Y) 
-                                      && !agent.IsSolid(pos.X - 1, pos.Y - 1) //mur a gauche et vide dessous, possible grab
+                                      && (pos.Y == 24 || //test if bottom to correct a bug (?)
+                                        !agent.IsSolid(pos.X - 1, pos.Y - 1)) //mur a gauche et vide dessous, possible grab
             ;
       action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X - 1, pos.Y - 1) };
       movementLibrary.Add(action);
@@ -949,7 +950,8 @@ namespace TFModFortRiseAiGraph
           .AddPhase(new MovementPhase(0.5f, jump: true, moveX: 1));  // ne pas bouger
       action.CalculateCost();
       action.Condition = (pos, ai) => agent.IsSolid(pos.X + 1, pos.Y)
-                                    && !agent.IsSolid(pos.X + 1, pos.Y - 1) //mur a gauche et vide dessous, possible grab
+                                    && (pos.Y == 24 || //test if bottom to correct a bug (?)
+                                        !agent.IsSolid(pos.X + 1, pos.Y - 1)) //mur a gauche et vide dessous, possible grab
                                     ; 
       action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X + 1, pos.Y - 1) };
       movementLibrary.Add(action);

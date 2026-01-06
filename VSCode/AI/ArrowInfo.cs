@@ -12,6 +12,8 @@ namespace TFModFortRiseAiGraph
   public class ArrowInfo
   {
     public ArrowStates state = ArrowStates.Shooting;
+    public ArrowTypes type = ArrowTypes.Normal;
+    public bool isCollectible = false;
     public int X = 0;
     public int Y = 0;
     public Vector2 Speed = Vector2.Zero;
