@@ -21,6 +21,7 @@ namespace TFModFortRiseAiGraph
     private static bool flipEffect = true;
     private static float flipTime = 0f;
     private static RenderTarget2D finalTarget;
+    public static int test = 0;
     internal static void Load()
     {
       On.TowerFall.Level.Update += Update_patch;
@@ -34,18 +35,21 @@ namespace TFModFortRiseAiGraph
     }
 
     public static void Update_patch(On.TowerFall.Level.orig_Update orig, global::TowerFall.Level self) {
+      //Logger.Info("Update_patch");
 
       if (!MyTFGame.sandbox)
       {
+        //try {
+        test++;
+        if (MyTFGame.displayPath && test%20 == 0)
+          self.Add(new DebugPathRenderer(AI.agents[0])); //current agent index to debug
         orig(self);
-        if (MyTFGame.displayPath && !sandboxEntityCreated) {
-          self.Add(new DebugPathRenderer(AI.agents[1]));
-          self.UpdateEntityLists();
-          sandboxEntityCreated = true;
-        }
+        //}
+        //catch (Exception e) {
+        //  Logger.Info("Level Update Exception: " + e.Message);
+        //}
         return;
       }
-
 
       int playerIndex;
       //SANDBOX
