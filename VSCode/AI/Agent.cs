@@ -286,7 +286,7 @@ namespace TFModFortRiseAiGraph
           if (currentAction != null && currentAction.Phases.Count > 0)
           {
             phaseTimer = currentAction.Phases[currentPhaseIndex].Duration;
-            Logger.Info($"Test {testActionName} : Condition: {currentAction.Condition(currentAction.StartPoint, this)}");
+            //Logger.Info($"Test {testActionName} : Condition: {currentAction.Condition(currentAction.StartPoint, this)}");
           }
         }
 
@@ -319,7 +319,7 @@ namespace TFModFortRiseAiGraph
           (currentAction == null ||
           (currentAction.Name != "ledgegrableftout" && currentAction.Name != "ledgegrabrightout")))
       {
-        Logger.Info("GrabEdge detecteeeeeeeeeeeeeeee");
+        //Logger.Info("GrabEdge detecteeeeeeeeeeeeeeee");
         string actionName = "";
         if (playerInfo.Facing == Facing.Left) {
           actionName = "ledgegrableftout";
@@ -328,11 +328,11 @@ namespace TFModFortRiseAiGraph
         }
         currentAction = movementLibrary.Find(a => a.Name == actionName);
         currentActions.Clear();
-        Logger.Info("currentAction  actionName : " + (currentAction != null ? currentAction.Name : "null"));
+        //Logger.Info("currentAction  actionName : " + (currentAction != null ? currentAction.Name : "null"));
       }
       else
       {
-        Logger.Info("pas GrabEdge");
+        //Logger.Info("pas GrabEdge");
       }
 
       // === LANCER UNE NOUVELLE ACTION ===
@@ -343,7 +343,7 @@ namespace TFModFortRiseAiGraph
         //  Logger.Info("  -> " + a.Name);
 
         currentAction = currentActions.Dequeue();
-        Logger.Info($"currentAction = {currentAction.Name}");
+        //Logger.Info($"currentAction = {currentAction.Name}");
         currentAction.StartPoint = WorldToCell(player.Position);
         currentAction.StartPosition = player.Position;
         currentPhaseIndex = 0;
@@ -371,7 +371,7 @@ namespace TFModFortRiseAiGraph
       HandleShooting();
       if (shootState != 0)
       {
-        Logger.Info("Shooting in progress, cancelling movement actions.");
+        //Logger.Info("Shooting in progress, cancelling movement actions.");
         currentActions.Clear();
         currentAction = null;
         currentPhaseIndex = 0;
@@ -387,7 +387,7 @@ namespace TFModFortRiseAiGraph
       // === ACTION EN COURS ===
       if (currentAction != null)
       {
-        Logger.Info("ExecuteActionPhases " + currentAction.Name);
+        //Logger.Info("ExecuteActionPhases " + currentAction.Name);
         ExecuteActionPhases(currentAction);
       }
     }
@@ -536,7 +536,7 @@ namespace TFModFortRiseAiGraph
     {
       if (player == null || enemy == null || playerInfo.NbArrows <= 0)
       {
-        Logger.Info($"player == {player} || enemy == {enemy} || playerInfo.NbArrows <= {playerInfo.NbArrows}");
+        //Logger.Info($"player == {player} || enemy == {enemy} || playerInfo.NbArrows <= {playerInfo.NbArrows}");
         shootState = 0;
         return;
       }
@@ -553,7 +553,7 @@ namespace TFModFortRiseAiGraph
       // Vérifier la ligne de visée
       if (!CanShootLineOfSight(new Point(playerInfo.X, playerInfo.Y), new Point(enemyInfo.X, enemyInfo.Y)))
       {
-        Logger.Info($"!CanShootLineOfSight");
+        //Logger.Info($"!CanShootLineOfSight");
         shootState = 0;
         return; // mur sur le trajet, ne pas tirer
       }
@@ -579,7 +579,7 @@ namespace TFModFortRiseAiGraph
 
       if (!canShoot)
       {
-        Logger.Info($"!canShoot");
+        //Logger.Info($"!canShoot");
         shootState = 0;
         return; // hors portée, ne pas tirer
       }
@@ -1108,7 +1108,7 @@ namespace TFModFortRiseAiGraph
 
       moves.Reverse();
       this.debugMoves = moves;
-      Logger.Info("Chemin trouvé avec les mouvements : " + string.Join(" -> ", moves));
+      //Logger.Info("Chemin trouvé avec les mouvements : " + string.Join(" -> ", moves));
       return path;
     }
 
