@@ -25,8 +25,8 @@ namespace TFModFortRiseAiGraph
     public bool Jump;
     public bool Dash;
     public Vector2 AimAxis;
-    public Func<Agent, Point, Vector2, bool> Condition; // <- modifié
-    public Func<Agent, Point, Vector2, bool> EndCondition; // <- modifié
+    public Func<AILogic, Point, Vector2, bool> Condition; // <- modifié
+    public Func<AILogic, Point, Vector2, bool> EndCondition; // <- modifié
 
     public MovementPhase(
         float duration,
@@ -34,8 +34,8 @@ namespace TFModFortRiseAiGraph
         int moveY = 0,
         bool jump = false,
         bool dash = false,
-        Func<Agent, Point, Vector2, bool> condition = null,
-        Func<Agent, Point, Vector2, bool> endCondition = null)
+        Func<AILogic, Point, Vector2, bool> condition = null,
+        Func<AILogic, Point, Vector2, bool> endCondition = null)
     {
       Duration = duration;
       MoveX = moveX;
@@ -47,7 +47,7 @@ namespace TFModFortRiseAiGraph
       EndCondition = endCondition;
     }
 
-    public bool IsFinished(Agent ai, Point startPoint, Vector2 startPosition, float timer)
+    public bool IsFinished(AILogic ai, Point startPoint, Vector2 startPosition, float timer)
     {
       if (EndCondition != null && EndCondition(ai, startPoint, startPosition))
         return true;

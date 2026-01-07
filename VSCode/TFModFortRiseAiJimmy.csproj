@@ -1,56 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <LangVersion>7.3</LangVersion>
-
+    <TargetFramework>net10.0</TargetFramework>
+    <ModLoaderPath>C:\Program Files (x86)\Steam\steamapps\common\TowerFall\FortRise</ModLoaderPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="fortrise4\**" />
-    <Compile Remove="MonoMod\**" />
-    <Compile Remove="towerfall_decompile_gog\**" />
-    <EmbeddedResource Remove="fortrise4\**" />
-    <EmbeddedResource Remove="MonoMod\**" />
-    <EmbeddedResource Remove="towerfall_decompile_gog\**" />
-    <None Remove="fortrise4\**" />
-    <None Remove="MonoMod\**" />
-    <None Remove="towerfall_decompile_gog\**" />
+    <PackageReference Include="FortRise.Configuration" Version="1.5.6" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="MonoMod" Version="22.5.1.1">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="MonoMod.RuntimeDetour" Version="22.5.1.1">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="TeuJson" Version="3.1.2">
-      <IncludeAssets>compile</IncludeAssets>
-    </PackageReference>
+  <Reference Include="TFModFortRiseAI.Abstractions">
+    <HintPath>../../TFModFortRiseAI.Abstractions/bin/Debug/net10.0/TFModFortRiseAI.Abstractions.dll</HintPath>
+    <Private>true</Private>
+  </Reference>
   </ItemGroup>
-
-
-
-  <ItemGroup>
-    <Reference Include="FNA">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\TowerFall\FNA.dll</HintPath>
-    </Reference>
-    <Reference Include="MMHOOK_TowerFall">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\TowerFall\MMHOOK_TowerFall.dll</HintPath>
-    </Reference>
-    <Reference Include="TeuJson">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\TowerFall\TeuJson.dll</HintPath>
-    </Reference>
-    <Reference Include="TFModFortRiseLoaderAI">
-      <HintPath>..\..\tf-mod-fortrise-loader-ai\release\tf-mod-fortrise-loader-ai\TFModFortRiseLoaderAI.dll</HintPath>
-    </Reference>
-    <Reference Include="TowerFall">
-      <HintPath>..\..\..\TowerFall.exe</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-    
 </Project>
 

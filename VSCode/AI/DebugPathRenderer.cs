@@ -8,9 +8,9 @@ namespace TFModFortRiseAiGraph
 {
   public class DebugPathRenderer : Entity
   {
-    private Agent ai;
+    private AILogic ai;
 
-    public DebugPathRenderer(Agent agent)
+    public DebugPathRenderer(AILogic agent)
     {
       ai = agent;
       Depth = -10000; // au-dessus de tout
@@ -23,7 +23,7 @@ namespace TFModFortRiseAiGraph
       if (ai == null || ai.debugPath == null || ai.debugPath.Count == 0)
         return;
 
-      const float cellSize = Agent.BLOCK_SIZE;
+      const float cellSize = AILogic.BLOCK_SIZE;
       const float half = cellSize / 2f;
 
       // --- Lignes reliant les cases du chemin ---
@@ -67,14 +67,14 @@ namespace TFModFortRiseAiGraph
       DrawLevelGrid(ai);
     }
 
-    private void DrawLevelGrid(Agent ai)
+    private void DrawLevelGrid(AILogic ai)
     {
-      const float cellSize = Agent.BLOCK_SIZE;
+      const float cellSize = AILogic.BLOCK_SIZE;
       Color gridColor = new Color(255, 255, 255, 20);
 
-      for (int y = 0; y < Agent.LEVEL_HEIGHT; y++)
+      for (int y = 0; y < AILogic.LEVEL_HEIGHT; y++)
       {
-        for (int x = 0; x < Agent.LEVEL_WIDTH; x++)
+        for (int x = 0; x < AILogic.LEVEL_WIDTH; x++)
         {
           if (ai.levelGrid == null) continue;
           int cell = ai.levelGrid[y, x];

@@ -9,7 +9,7 @@ namespace TFModFortRiseAiGraph
 {
   public static class AIMovementLibrary
   {
-    public static List<MovementAction> BuildLibrary(Agent agent)
+    public static List<MovementAction> BuildLibrary(AILogic agent)
     {
       var movementLibrary = new List<MovementAction>();
 

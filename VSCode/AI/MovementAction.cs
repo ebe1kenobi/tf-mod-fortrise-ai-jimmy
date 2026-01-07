@@ -21,8 +21,8 @@ namespace TFModFortRiseAiGraph
   {
     public string Name;                        // nom du mouvement pour debug
     public List<MovementPhase> Phases;         // phases du mouvement
-    public Func<Point, Agent, bool> Condition; // condition pour lancer le mouvement
-    public Func<Point, Agent, List<Point>> ResultPositions;   // position finale approximative
+    public Func<Point, AILogic, bool> Condition; // condition pour lancer le mouvement
+    public Func<Point, AILogic, List<Point>> ResultPositions;   // position finale approximative
     public float Cost;                          // coût du mouvement (temps total)
                                                 // Nouvelle propriété :
     public Point StartPoint;
