@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Diagnostics;
 using FortRise;
 using Microsoft.Extensions.Logging;
 using TFModFortRiseLoaderAI;
-using TowerFall;
 
 namespace TFModFortRiseAiGraph
 {
