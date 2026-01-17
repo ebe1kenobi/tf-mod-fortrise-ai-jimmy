@@ -1,13 +1,7 @@
-﻿using System;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using FortRise;
 using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Monocle;
-using TFModFortRiseAI.Abstractions;
+using TFModFortRiseLoaderAI;
 using TowerFall;
 
 namespace TFModFortRiseAiGraph
@@ -22,7 +16,7 @@ namespace TFModFortRiseAiGraph
     public static int sublevel = 1;
     public static bool customLevel = true;
 
-    public static List<IAgentLogic> agents;
+    public static List<ILoaderAIModApi.IAgentLogic> agents;
 
     static bool RegisterAgent = false;
     public static void Load(IHarmony harmony)

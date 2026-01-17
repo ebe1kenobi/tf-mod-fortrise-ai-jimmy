@@ -4,7 +4,8 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Monocle;
 using MonoMod.Utils;
-using TFModFortRiseAI.Abstractions;
+using TFModFortRiseLoaderAI;
+
 //using TFModFortRiseAiSimple;
 using TowerFall;
 using static System.Net.Mime.MediaTypeNames;
@@ -13,7 +14,7 @@ using static TowerFall.Player;
 
 namespace TFModFortRiseAiGraph
 {
-  public class AILogic : IAgentLogic
+  public class AILogic : ILoaderAIModApi.IAgentLogic
   {
     public string Type => "AIJIMMY";
 
@@ -158,14 +159,14 @@ namespace TFModFortRiseAiGraph
     List<int> actions = new List<int>() { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     List<int> GetAction() {
-      actions[IAgentLogic.X] = inputState.MoveX;
-      actions[IAgentLogic.Y] = inputState.MoveY;
-      actions[IAgentLogic.JUMP_CHECK] = inputState.JumpCheck ? 1 : 0;
-      actions[IAgentLogic.JUMP_PRESSED] = inputState.JumpPressed ? 1 : 0;
-      actions[IAgentLogic.DODGE_CHECK] = inputState.DodgeCheck ? 1 : 0;
-      actions[IAgentLogic.DODGE_PRESSED] = inputState.DodgePressed ? 1 : 0;
-      actions[IAgentLogic.SHOOT_CHECK] = inputState.ShootCheck ? 1 : 0;
-      actions[IAgentLogic.SHOOT_PRESSED] = inputState.ShootPressed ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.X] = inputState.MoveX;
+      actions[ILoaderAIModApi.IAgentLogic.Y] = inputState.MoveY;
+      actions[ILoaderAIModApi.IAgentLogic.JUMP_CHECK] = inputState.JumpCheck ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.JUMP_PRESSED] = inputState.JumpPressed ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.DODGE_CHECK] = inputState.DodgeCheck ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.DODGE_PRESSED] = inputState.DodgePressed ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.SHOOT_CHECK] = inputState.ShootCheck ? 1 : 0;
+      actions[ILoaderAIModApi.IAgentLogic.SHOOT_PRESSED] = inputState.ShootPressed ? 1 : 0;
       return actions;     
     }
     public void setCopy() {
