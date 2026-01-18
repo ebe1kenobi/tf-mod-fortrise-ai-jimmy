@@ -63,6 +63,7 @@ namespace TFModFortRiseAiGraph
         if (Agent.testMode) {
           player1 = EntityCreator.CreatePlayer(playerIndex, self.Session.MatchSettings.GetPlayerAllegiance(playerIndex), Agent.testActionX2, Agent.testActionY2);
         } else{
+          //Logger.Info($"AI.l1_4_X1, AI.l1_4_Y1 {AI.l1_4_X1},{AI.l1_4_Y1}");
           player1 = EntityCreator.CreatePlayer(playerIndex, self.Session.MatchSettings.GetPlayerAllegiance(playerIndex), AI.l1_4_X1, AI.l1_4_Y1);
         }
         self.Add(player1);
@@ -73,6 +74,7 @@ namespace TFModFortRiseAiGraph
         }
         else
         {
+          //Logger.Info($"AI.l1_4_X2, AI.l1_4_X2 {AI.l1_4_X1},{AI.l1_4_Y2}");
           player2 = EntityCreator.CreatePlayer(playerIndex, self.Session.MatchSettings.GetPlayerAllegiance(playerIndex), AI.l1_4_X2, AI.l1_4_Y2);
         }
         self.Add(player2);

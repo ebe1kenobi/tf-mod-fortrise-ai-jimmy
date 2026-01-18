@@ -19,6 +19,7 @@ namespace TFModFortRiseAiGraph
     public bool CanWallJump = false;
     public Facing Facing;
     public int NbArrows = 0;
+    public bool dodgeCooldown = false;
     //HasShield
     //HasWings
     //List arrows
@@ -39,6 +40,7 @@ namespace TFModFortRiseAiGraph
       CanWallJump = false;
       Speed = Vector2.Zero;
       Facing = Facing.Right;
+      dodgeCooldown = false;
     }
   }
 

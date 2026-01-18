@@ -38,19 +38,21 @@ namespace TFModFortRiseAiGraph
       };
       movementLibrary.Add(action);
       //////////////////////// ok   depart dans l'air possible
-      action = new MovementAction("dashup") 
-          .AddPhase(new MovementPhase(0.4f, moveY: -1, dash:true)) // ne pas bouger
-         //.AddPhase(new MovementPhase(0.0f, moveY: -1, jump: false)) // ne pas bouger
-        //.AddPhase(new MovementPhase(0.5f, moveX: 0));
+      action = new MovementAction("dashup")  //problem with this , agent not move anymore, remove condition to test
+          .AddPhase(new MovementPhase(0.1f, moveY: -1, dash: false)) // ne pas bouger
+          .AddPhase(new MovementPhase(0.3f, moveY: -1, dash: true))
+      //.AddPhase(new MovementPhase(0.0f, moveY: -1, jump: false)) // ne pas bouger
+      //.AddPhase(new MovementPhase(0.5f, moveX: 0));
       ;  // ne pas bouger
       action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
       //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
       action.Condition = (pos, ai) =>
                                       //agent.IsSolid(pos.X, pos.Y + 1)  //pas besoin d etre au sol, peut dashé en l'air
                                       //&& agent.IsSolid(pos.X - 1, pos.Y + 1) 
                                       //&& 
                                       agent.IsAreaFree(pos.X, pos.X, pos.Y, pos.Y - 4)  //air libre pour sauté
-                                      //&& !agent.IsSolid(pos.X, pos.Y)
+                                                                                        //&& !agent.IsSolid(pos.X, pos.Y)
       ;
       action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X, pos.Y - 3) };
       movementLibrary.Add(action);
@@ -133,7 +135,8 @@ namespace TFModFortRiseAiGraph
                                       //agent.IsSolid(pos.X, pos.Y + 1)
                                       //&& agent.IsSolid(pos.X - 1, pos.Y + 1) 
                                       //&& 
-                                      !agent.IsSolid(pos.X - 1, pos.Y)
+                                      //!agent.IsSolid(pos.X - 1, pos.Y)
+                                      agent.IsAreaFree(pos.X, pos.X -1, pos.Y, pos.Y - 1)  //air libre pour sauté
       ;
       action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X - 1, pos.Y) };
       movementLibrary.Add(action);
@@ -148,9 +151,48 @@ namespace TFModFortRiseAiGraph
                                       //agent.IsSolid(pos.X, pos.Y + 1)
                                       //&& agent.IsSolid(pos.X + 1, pos.Y + 1) 
                                       //&& 
-                                      !agent.IsSolid(pos.X + 1, pos.Y)
+                                      //!agent.IsSolid(pos.X + 1, pos.Y)
+                                      agent.IsAreaFree(pos.X, pos.X +1, pos.Y, pos.Y - 1)  //air libre pour sauté
                                       ;
       action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X + 1, pos.Y) };
+      movementLibrary.Add(action);
+      //////////////////////// ok
+      action = new MovementAction("duckdashleftm1")
+          .AddPhase(new MovementPhase(0.2f, moveX: -1))  // ne pas bouger
+          .AddPhase(new MovementPhase(0.2f, moveY: 1))  // ne pas bouger
+          .AddPhase(new MovementPhase(1f, moveY: 1, dash: true)) // ne pas bouger
+          //.AddPhase(new MovementPhase(1f, moveY: 1, dash: true, endCondition: (ai, startPoint, startPosition) => ai.playerInfo.X == startPoint.X + 1)) // ne pas bouger
+                                                                                                                                                       //.AddPhase(new MovementPhase(0.5f, moveX: 0));
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      //agent.IsSolid(pos.X, pos.Y + 1)
+                                      //&& agent.IsSolid(pos.X - 1, pos.Y + 1) 
+                                      //&& 
+                                      //!agent.IsSolid(pos.X - 1, pos.Y)
+                                      agent.IsAreaFree(pos.X, pos.X - 2, pos.Y, pos.Y)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X - 2, pos.Y) };
+      movementLibrary.Add(action);
+      //////////////////////// ok
+      action = new MovementAction("duckdashrightp1")
+          .AddPhase(new MovementPhase(0.2f, moveX: 1))  // ne pas bouger
+          .AddPhase(new MovementPhase(0.2f, moveY: 1))  // ne pas bouger
+          .AddPhase(new MovementPhase(1f, moveY: 1, dash: true)) // ne pas bouger
+          //.AddPhase(new MovementPhase(1f, moveY: 1, dash: true, endCondition: (ai, startPoint, startPosition) => ai.playerInfo.X == startPoint.X + 1)) // ne pas bouger
+                                                                                                                                                         //.AddPhase(new MovementPhase(0.5f, moveX: 0));
+      ;// ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      //agent.IsSolid(pos.X, pos.Y + 1)
+                                      //&& agent.IsSolid(pos.X + 1, pos.Y + 1) 
+                                      //&& 
+                                      //!agent.IsSolid(pos.X + 1, pos.Y)
+                                      agent.IsAreaFree(pos.X, pos.X + 2, pos.Y, pos.Y)  //air libre pour sauté
+                                      ;
+      action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X + 2, pos.Y) };
       movementLibrary.Add(action);
       /////////////////////// ok ok
       action = new MovementAction("jumplefetholem2m0")
@@ -937,7 +979,9 @@ namespace TFModFortRiseAiGraph
       //movementLibrary.Add(action);
       ////////////////////////
       action = new MovementAction("ledgegrableftout")
-          .AddPhase(new MovementPhase(0.5f, jump: true, moveX: -1));  // ne pas bouger
+          .AddPhase(new MovementPhase(0.5f, jump: true, moveX: -1))
+          .AddPhase(new MovementPhase(0.3f, jump: false, moveX: 0, moveY: 0))
+          ;  // ne pas bouger
       action.CalculateCost();
       action.Condition = (pos, ai) => agent.IsSolid(pos.X - 1, pos.Y) 
                                       && (pos.Y == 24 || //test if bottom to correct a bug (?)
@@ -947,7 +991,9 @@ namespace TFModFortRiseAiGraph
       movementLibrary.Add(action);
       ////////////////////////
       action = new MovementAction("ledgegrabrightout")
-          .AddPhase(new MovementPhase(0.5f, jump: true, moveX: 1));  // ne pas bouger
+          .AddPhase(new MovementPhase(0.5f, jump: true, moveX: 1))  // ne pas bouger
+          .AddPhase(new MovementPhase(0.3f, jump: false, moveX: 0, moveY: 0))
+;
       action.CalculateCost();
       action.Condition = (pos, ai) => agent.IsSolid(pos.X + 1, pos.Y)
                                     && (pos.Y == 24 || //test if bottom to correct a bug (?)

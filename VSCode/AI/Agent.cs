@@ -12,23 +12,29 @@
 /////////////
 // + detection loop movement
 // todo prendre en compte type fleche  (test tail level 3 bomb arrow)
-    //public enum ArrowTypes
-    //{
-    //  Normal,
-    //  Bomb,
-    //  SuperBomb,
-    //  Laser,
-    //  Bramble,
-    //  Drill,
-    //  Bolt,
-    //  Feather,
-    //  Trigger,
-    //  Prism
-    //}
+//public enum ArrowTypes
+//{
+//  Normal,
+//  Bomb,
+//  SuperBomb,
+//  Laser,
+//  Bramble,
+//  Drill,
+//  Bolt,
+//  Feather,
+//  Trigger,
+//  Prism
+//}
+//bloquer quand les ia sont face a face a travers un trou ou il faut s accroupir entre la gauche et la droite de l ecran rightp1  lefpp1 utilisé alors que pas la palce
+//ajouter duckrightp1
+// detecter pickup bomb et marquer comme dangeureux
+//todo shoot pas a travers trou si adversaire juste de l autre côté
+//todo des fois le shoot ne part pas il reste avec la fleche engagé : test SHOOT_HOLD_FRAMES de  2 a 5
+//todo se baisser ou sauter si pas de fleche quand dodge cooldown
 // todo prendre en conmpte coffre
 // todo prendre en copte playtag mode
 // todo recuperer plus de une fleche ?
-// todo ajouter hyperjump et superjump
+// todo ajouter hyperjump et superjump superrun
 //- center the player before action
 //- speed = 0 ?
 //- delete movex = 0 for each action whith speed = 0
@@ -69,11 +75,17 @@ namespace TFModFortRiseAiGraph
 
     //public static bool testMode = true;
     public static bool testMode = false;
-    public string testActionName = "jumpup14"; // Change ici pour tester une autre action
-    public static int testActionX1 = 305; //au bout du niveau a droite
-    public static int testActionY1 = 222;  //au sol
-    public static int testActionX2 = 15; //au bout du niveau a droite
+    public string testActionName = "dashup"; // Change ici pour tester une autre action
+    //public static int testActionX1 = 305; //au bout du niveau a droite
+    //public static int testActionY1 = 222;  //au sol
+    //public static int testActionX2 = 15; //au bout du niveau a droite
+    //public static int testActionY2 = 222;  //au sol
+    //correctonedge
+    public static int testActionX1 = 307; //au bout du niveau a droite
+    public static int testActionY1 = 192;  //au sol
+    public static int testActionX2 = 20; //au bout du niveau a droite
     public static int testActionY2 = 222;  //au sol
+
     public int testNone = 0;
 
     public float testPauseTimer = 0f;
@@ -102,7 +114,7 @@ namespace TFModFortRiseAiGraph
     public int shootState = 0; // 0 = idle, 1 = preparing, 2 = shooting, 3 = cooldown
     public int shootFrameCounter = 0;
     public Vector2 shootDirection = Vector2.Zero;
-    public const int SHOOT_HOLD_FRAMES = 2;
+    public const int SHOOT_HOLD_FRAMES = 5;
     public const int SHOOT_COOLDOWN_FRAMES = 5;
     // Variables supplémentaires à mettre en haut de la classe
     public float shootCooldownTimer = 0f;
@@ -315,25 +327,26 @@ namespace TFModFortRiseAiGraph
       }
 
       //test si ledgegrab ongoing (todo test)
-      if (playerInfo.GrabEdge &&
-          (currentAction == null ||
-          (currentAction.Name != "ledgegrableftout" && currentAction.Name != "ledgegrabrightout")))
-      {
-        //Logger.Info("GrabEdge detecteeeeeeeeeeeeeeee");
-        string actionName = "";
-        if (playerInfo.Facing == Facing.Left) {
-          actionName = "ledgegrableftout";
-        } else {
-          actionName = "ledgegrabrightout";
-        }
-        currentAction = movementLibrary.Find(a => a.Name == actionName);
-        currentActions.Clear();
-        //Logger.Info("currentAction  actionName : " + (currentAction != null ? currentAction.Name : "null"));
-      }
-      else
-      {
-        //Logger.Info("pas GrabEdge");
-      }
+      //if (playerInfo.GrabEdge &&
+      //    (currentAction == null ||
+      //    (currentAction.Name != "ledgegrableftout" && currentAction.Name != "ledgegrabrightout")))
+      //{
+      //  Logger.Info($"GrabEdge detecteeeeeeeeeeeeeeee currentAction== null {currentAction == null}  ");
+      //  string actionName = "";
+      //  if (playerInfo.Facing == Facing.Left) {
+      //    actionName = "ledgegrableftout";
+      //  } else {
+      //    actionName = "ledgegrabrightout";
+      //  }
+      //  currentAction = movementLibrary.Find(a => a.Name == actionName);
+      //  currentActions.Clear();
+      //  currentActions.Enqueue(currentAction);
+      //  Logger.Info($"currentActions.count = {currentActions.Count} .currentAction  actionName : " + (currentAction != null ? currentAction.Name : "null"));
+      //}
+      //else
+      //{
+      //  //Logger.Info("pas GrabEdge");
+      //}
 
       // === LANCER UNE NOUVELLE ACTION ===
       if (currentAction == null && currentActions.Count > 0)
@@ -387,7 +400,7 @@ namespace TFModFortRiseAiGraph
       // === ACTION EN COURS ===
       if (currentAction != null)
       {
-        //Logger.Info("ExecuteActionPhases " + currentAction.Name);
+        //Logger.Info($"{index} ExecuteActionPhases " + currentAction.Name);
         ExecuteActionPhases(currentAction);
       }
     }
@@ -406,7 +419,7 @@ namespace TFModFortRiseAiGraph
         if (!conditionOk)
         {
           // Passe directement à la suivante
-          //Logger.Info($"Phase {currentPhaseIndex} ignorée ({phase}) car condition non remplie");
+          //Logger.Info($"{index} Phase {currentPhaseIndex} ignorée ({phase}) car condition non remplie");
           currentPhaseIndex++;
           if (currentPhaseIndex < action.Phases.Count)
             phaseTimer = action.Phases[currentPhaseIndex].Duration;
@@ -415,7 +428,7 @@ namespace TFModFortRiseAiGraph
 
         // Phase active : on applique les inputs
         phaseTimer -= Engine.DeltaTime;
-        //Logger.Info($"ApplyPhaseInputs = {currentPhaseIndex}");
+        //Logger.Info($"{index} ApplyPhaseInputs = {currentPhaseIndex}");
         ApplyPhaseInputs(phase);
 
         // Condition de fin atteinte ?
@@ -425,6 +438,7 @@ namespace TFModFortRiseAiGraph
           if (currentPhaseIndex >= action.Phases.Count)
           {
             currentAction = null; // Fin de l’action complète
+            //Logger.Info($"{index} Fin de l’action complète 1");
             return;
           }
           else
@@ -439,6 +453,7 @@ namespace TFModFortRiseAiGraph
       // Si toutes les phases ont été sautées → fin de l’action
       if (currentAction != null && currentPhaseIndex >= currentAction.Phases.Count)
       {
+        //Logger.Info($"{index} Fin de l’action complète 2");
         currentAction = null;
       }
     }
@@ -545,12 +560,8 @@ namespace TFModFortRiseAiGraph
       shootCooldownTimer += Engine.DeltaTime;
       if (shootCooldownTimer < nextShootCooldown && shootState == 0) return;
 
-      // Calcul direction vers l'ennemi
-      Vector2 dir = enemy.Position - player.Position;
-      if (dir != Vector2.Zero) dir.Normalize();
-      shootDirection = dir;
-
       // Vérifier la ligne de visée
+      //Logger.Info($"if (!CanShootLineOfSight(new Point({playerInfo.X}, {playerInfo.Y}), new Point({enemyInfo.X}, {enemyInfo.Y})))");
       if (!CanShootLineOfSight(new Point(playerInfo.X, playerInfo.Y), new Point(enemyInfo.X, enemyInfo.Y)))
       {
         //Logger.Info($"!CanShootLineOfSight");
@@ -559,24 +570,98 @@ namespace TFModFortRiseAiGraph
       }
 
       // Déterminer le type de tir et vérifier la portée
-      float deltaX = enemyInfo.X - playerInfo.X;
-      float deltaY = enemyInfo.Y - playerInfo.Y;
-      bool canShoot = false;
+      // Calculer la distance en tenant compte du wrap (comme pour la ligne de visée)
+      float deltaXDirect = enemyInfo.X - playerInfo.X;
+      float deltaYDirect = enemyInfo.Y - playerInfo.Y;
 
-      // Tir horizontal
-      if (Math.Abs(deltaY) <= 1 && Math.Abs(deltaX) <= MIN_X_SHOOT) canShoot = true;
-
-      // Tir vertical haut
-      else if (deltaX == 0 && deltaY < 0 && Math.Abs(deltaY) <= MIN_Y_SHOOT) canShoot = true;
-
-      // Tir diagonale haut
-      else if (deltaX != 0 && deltaY < 0)
+      // Calculer les distances wrappées
+      float deltaXWrapped = deltaXDirect;
+      if (Math.Abs(deltaXDirect) > levelWidth / 2)
       {
-        int maxDiagonalX = MIN_X_DIAG_SHOOT;
-        int maxDiagonalY = MIN_Y_DIAG_SHOOT; // flèche atteint Y+9 avant de retomber
-        if (Math.Abs(deltaX) <= maxDiagonalX && Math.Abs(deltaY) <= maxDiagonalY) canShoot = true;
+        deltaXWrapped = deltaXDirect > 0 ? deltaXDirect - levelWidth : deltaXDirect + levelWidth;
       }
 
+      float deltaYWrapped = deltaYDirect;
+      if (Math.Abs(deltaYDirect) > levelHeight / 2)
+      {
+        deltaYWrapped = deltaYDirect > 0 ? deltaYDirect - levelHeight : deltaYDirect + levelHeight;
+      }
+
+      // Essayer avec le chemin direct d'abord, puis avec le chemin wrappé si nécessaire
+      bool canShoot = false;
+      bool useWrappedPath = false;
+
+      // Vérifier le chemin direct
+      if (!canShoot)
+      {
+        float deltaX = deltaXDirect;
+        float deltaY = deltaYDirect;
+
+        // Tir horizontal
+        if (Math.Abs(deltaY) <= 1 && Math.Abs(deltaX) <= MIN_X_SHOOT) canShoot = true;
+        // Tir vertical haut
+        else if (deltaX == 0 && deltaY < 0 && Math.Abs(deltaY) <= MIN_Y_SHOOT) canShoot = true;
+        // Tir vertical bas
+        else if (deltaX == 0 && deltaY > 0 && Math.Abs(deltaY) <= MIN_Y_SHOOT) canShoot = true;
+        // Tir diagonale haut
+        else if (deltaX != 0 && deltaY < 0)
+        {
+          int maxDiagonalX = MIN_X_DIAG_SHOOT;
+          int maxDiagonalY = MIN_Y_DIAG_SHOOT;
+          if (Math.Abs(deltaX) <= maxDiagonalX && Math.Abs(deltaY) <= maxDiagonalY) canShoot = true;
+        }
+        // Tir diagonale bas
+        else if (deltaX != 0 && deltaY > 0)
+        {
+          int maxDiagonalX = MIN_X_DIAG_SHOOT;
+          int maxDiagonalY = MIN_Y_DIAG_SHOOT;
+          if (Math.Abs(deltaX) <= maxDiagonalX && Math.Abs(deltaY) <= maxDiagonalY) canShoot = true;
+        }
+      }
+
+      // Si le chemin direct ne fonctionne pas, essayer le chemin wrappé
+      if (!canShoot && (deltaXWrapped != deltaXDirect || deltaYWrapped != deltaYDirect))
+      {
+        float deltaX = deltaXWrapped;
+        float deltaY = deltaYWrapped;
+
+        // Tir horizontal
+        if (Math.Abs(deltaY) <= 1 && Math.Abs(deltaX) <= MIN_X_SHOOT) { canShoot = true; useWrappedPath = true; }
+        // Tir vertical haut
+        else if (deltaX == 0 && deltaY < 0 && Math.Abs(deltaY) <= MIN_Y_SHOOT) { canShoot = true; useWrappedPath = true; }
+        // Tir vertical bas
+        else if (deltaX == 0 && deltaY > 0 && Math.Abs(deltaY) <= MIN_Y_SHOOT) { canShoot = true; useWrappedPath = true; }
+        // Tir diagonale haut
+        else if (deltaX != 0 && deltaY < 0)
+        {
+          int maxDiagonalX = MIN_X_DIAG_SHOOT;
+          int maxDiagonalY = MIN_Y_DIAG_SHOOT;
+          if (Math.Abs(deltaX) <= maxDiagonalX && Math.Abs(deltaY) <= maxDiagonalY) { canShoot = true; useWrappedPath = true; }
+        }
+        // Tir diagonale bas
+        else if (deltaX != 0 && deltaY > 0)
+        {
+          int maxDiagonalX = MIN_X_DIAG_SHOOT;
+          int maxDiagonalY = MIN_Y_DIAG_SHOOT;
+          if (Math.Abs(deltaX) <= maxDiagonalX && Math.Abs(deltaY) <= maxDiagonalY) { canShoot = true; useWrappedPath = true; }
+        }
+      }
+
+      // Calculer la direction de tir en fonction du chemin utilisé
+      if (useWrappedPath)
+      {
+        // Utiliser les distances wrappées pour la direction
+        Vector2 dir = new Vector2(deltaXWrapped, deltaYWrapped);
+        if (dir != Vector2.Zero) dir.Normalize();
+        shootDirection = dir;
+      }
+      else
+      {
+        // Utiliser la direction directe
+        Vector2 dir = enemy.Position - player.Position;
+        if (dir != Vector2.Zero) dir.Normalize();
+        shootDirection = dir;
+      }
       if (!canShoot)
       {
         //Logger.Info($"!canShoot");
@@ -587,6 +672,7 @@ namespace TFModFortRiseAiGraph
       // --- Cycle multi-frame ---
       if (shootState == 0)
       {
+        //Logger.Info($"préparer le tir");
         shootState = 1; // préparer le tir
         shootFrameCounter = 0;
         shootCooldownTimer = 0f; // reset cooldown
@@ -595,6 +681,7 @@ namespace TFModFortRiseAiGraph
 
       if (shootState == 1) // préparer
       {
+        //Logger.Info($"shootState == 1");
         shootFrameCounter++;
         this.input.inputState.AimAxis = shootDirection;
         this.input.inputState.ShootCheck = true;
@@ -602,12 +689,14 @@ namespace TFModFortRiseAiGraph
 
         if (shootFrameCounter >= SHOOT_HOLD_FRAMES)
         {
+          //Logger.Info($"shootFrameCounter >= SHOOT_HOLD_FRAMES");
           shootState = 2;
           shootFrameCounter = 0;
         }
       }
       else if (shootState == 2) // relâchement
       {
+        //Logger.Info($"shootState == 2");
         shootFrameCounter++;
         this.input.inputState.AimAxis = shootDirection;
         this.input.inputState.ShootCheck = false;
@@ -615,6 +704,7 @@ namespace TFModFortRiseAiGraph
 
         if (shootFrameCounter >= SHOOT_COOLDOWN_FRAMES)
         {
+          //Logger.Info($"shootFrameCounter >= SHOOT_COOLDOWN_FRAMES");
           shootState = 0; // prêt pour prochain tir
           shootFrameCounter = 0;
           //playerInfo.NbArrows--; // décrémente le nombre de flèches
@@ -682,6 +772,8 @@ namespace TFModFortRiseAiGraph
       // Essayer les chemins à travers les trous (wrap)
       List<Point> startWrapped = GetWrappedPositions(start);
       List<Point> endWrapped = GetWrappedPositions(end);
+      //Logger.Info($"startWrapped = {string.Join(", ", startWrapped)}");
+      //Logger.Info($"endWrapped = {string.Join(", ", endWrapped)}");
 
       foreach (Point startWrap in startWrapped)
       {
@@ -702,6 +794,33 @@ namespace TFModFortRiseAiGraph
       int y0 = start.Y;
       int x1 = end.X;
       int y1 = end.Y;
+
+      // Détecter si on traverse un bord horizontal (gauche <-> droite)
+      int dxDirect = Math.Abs(x1 - x0);
+      int dxWrapped = levelWidth - dxDirect;
+      bool useWrappedX = dxWrapped < dxDirect && dxWrapped < levelWidth / 2;
+
+      // Détecter si on traverse un bord vertical (haut <-> bas)
+      int dyDirect = Math.Abs(y1 - y0);
+      int dyWrapped = levelHeight - dyDirect;
+      bool useWrappedY = dyWrapped < dyDirect && dyWrapped < levelHeight / 2;
+
+      // Ajuster les coordonnées de destination si on utilise le wrap
+      if (useWrappedX)
+      {
+        if (x0 < x1)
+          x1 = x1 - levelWidth; // Aller vers la gauche depuis la droite
+        else
+          x1 = x1 + levelWidth; // Aller vers la droite depuis la gauche
+      }
+
+      if (useWrappedY)
+      {
+        if (y0 < y1)
+          y1 = y1 - levelHeight; // Aller vers le haut depuis le bas
+        else
+          y1 = y1 + levelHeight; // Aller vers le bas depuis le haut
+      }
 
       int dx = Math.Abs(x1 - x0);
       int dy = Math.Abs(y1 - y0);
@@ -1214,6 +1333,7 @@ namespace TFModFortRiseAiGraph
       playerInfo.onGround = dynData.Get<bool>("OnGround");
       playerInfo.GrabEdge = dynData.Get<PlayerStates>("State") == PlayerStates.LedgeGrab;
       playerInfo.Speed = player.Speed;
+      playerInfo.dodgeCooldown = dynData.Get<bool>("dodgeCooldown");
       playerInfo.NbArrows = player.Arrows.Count;
       //if (0 == dynData.Get<int>("PlayerIndex"))
       //Logger.Info(playerInfo.Speed.X.ToString());
