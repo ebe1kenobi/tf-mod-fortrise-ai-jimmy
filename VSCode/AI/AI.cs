@@ -571,6 +571,31 @@ namespace TFModFortRiseAiGraph
 00000000000000001000000000000000
 11111111111111111111111111111111";
 
+      String testhyperjump = @"
+11111111111111100000011111111111
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10010101010101010101010101010101
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+10000000000000000000000000000001
+11111111111111111111111111111111";
       ///////////////////////////////
       //matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(dash));
       //matchSettings.LevelSystem = new  SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(jumpblocdiagonale2));
@@ -590,11 +615,16 @@ namespace TFModFortRiseAiGraph
       //l1_4_X2 = 300;
       //l1_4_Y2 = 222;
       //matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(testduckright));
+      //l1_4_X1 = 20;
+      //l1_4_Y1 = 222;
+      //l1_4_X2 = 300;
+      //l1_4_Y2 = 222;
+      //matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(testduckright));
       l1_4_X1 = 20;
       l1_4_Y1 = 222;
       l1_4_X2 = 300;
       l1_4_Y2 = 222;
-      matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(testduckright));
+      matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(testhyperjump));
       ///////////////////////////////
       //LoadLevel("01_02");
       //matchSettings.LevelSystem = new SandboxLevelSystem(GameData.QuestLevels[0], convertToStringToArray(s));

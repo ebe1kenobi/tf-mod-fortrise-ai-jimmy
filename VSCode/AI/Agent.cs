@@ -73,17 +73,22 @@ namespace TFModFortRiseAiGraph
     public Queue<MovementAction> currentActions = new Queue<MovementAction>();
     public float actionTimer = 0f;
 
-    //public static bool testMode = true;
-    public static bool testMode = false;
-    public string testActionName = "dashup"; // Change ici pour tester une autre action
+    public static bool testMode = true;
+    //public static bool testMode = false;
+    public string testActionName = "runrightm16"; // Change ici pour tester une autre action
     //public static int testActionX1 = 305; //au bout du niveau a droite
     //public static int testActionY1 = 222;  //au sol
     //public static int testActionX2 = 15; //au bout du niveau a droite
     //public static int testActionY2 = 222;  //au sol
     //correctonedge
-    public static int testActionX1 = 307; //au bout du niveau a droite
-    public static int testActionY1 = 192;  //au sol
-    public static int testActionX2 = 20; //au bout du niveau a droite
+    //public static int testActionX1 = 307; //au bout du niveau a droite
+    //public static int testActionY1 = 192;  //au sol
+    //public static int testActionX2 = 20; //au bout du niveau a droite
+    //public static int testActionY2 = 222;  //au sol
+    //hyperjumpleft
+    public static int testActionX1 = 22; //au bout du niveau a droite
+    public static int testActionY1 = 222;  //au sol
+    public static int testActionX2 = 300; //au bout du niveau a droite
     public static int testActionY2 = 222;  //au sol
 
     public int testNone = 0;
@@ -298,7 +303,7 @@ namespace TFModFortRiseAiGraph
           if (currentAction != null && currentAction.Phases.Count > 0)
           {
             phaseTimer = currentAction.Phases[currentPhaseIndex].Duration;
-            //Logger.Info($"Test {testActionName} : Condition: {currentAction.Condition(currentAction.StartPoint, this)}");
+            Logger.Info($"Test {testActionName} : Condition: {currentAction.Condition(currentAction.StartPoint, this)}");
           }
         }
 
@@ -1450,11 +1455,21 @@ namespace TFModFortRiseAiGraph
     // --- Description d’un mouvement possible ---
 
 
+    public static void Shuffle<T>(IList<T> list)
+    {
+      Random rng = new Random();
 
+      for (int i = list.Count - 1; i > 0; i--)
+      {
+        int swapIndex = rng.Next(i + 1);
+        (list[i], list[swapIndex]) = (list[swapIndex], list[i]);
+      }
+    }
 
     private void InitMovementLibrary()
     {
       movementLibrary = AIMovementLibrary.BuildLibrary(this);
+      //Shuffle(movementLibrary);
     }
 
     // --- Aides de physique simple ---

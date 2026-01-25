@@ -20,6 +20,204 @@ namespace TFModFortRiseAiGraph
       //action.ResultPositions = (pos, ai) => new List<Point> { new Point(pos.X, pos.Y) };
       //movementLibrary.Add(action);
       //////////////////////// ok
+      /////////////////////// ok
+      action = new MovementAction("hyperjumpleftm29") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: -1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.1f, moveY: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))
+          .AddPhase(new MovementPhase(0.8f, moveX: -1, jump: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X - 29, pos.Y, pos.Y - 4)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X - 29, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("hyperjumprightm29") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.1f, moveY: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))
+          .AddPhase(new MovementPhase(0.8f, moveX: 1, jump: true))
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X + 29, pos.Y, pos.Y - 4)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X + 29, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("hyperjumpleftm21") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: -1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.1f, moveY: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))
+          .AddPhase(new MovementPhase(0.2f, moveX: -1, jump: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X - 21, pos.Y, pos.Y - 3)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X - 21, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("hyperjumprightm21") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.1f, moveY: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveY: 1, dash: true))
+          .AddPhase(new MovementPhase(0.2f, moveX: 1, jump: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X + 21, pos.Y, pos.Y - 3)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X + 21, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runleftm8") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: -1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: -1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.05f, moveX: -1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X - 8, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X - 8, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X - 8, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runleftm12") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: -1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: -1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.2f, moveX: -1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X - 12, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X - 12, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X - 12, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runleftm16") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: -1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: -1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.4f, moveX: -1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X - 16, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X - 16, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X - 16, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runrightm8") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.05f, moveX: 1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X + 8, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X + 8, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X + 8, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runrightm12") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.2f, moveX: 1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X + 12, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X + 12, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X + 12, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
+      action = new MovementAction("runrightm16") //todo mettre un poids plus fort pour en pas l'utilsier tout le temps
+          .AddPhase(new MovementPhase(0.001f, moveX: 1))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.005f, moveX: 1, dash: true))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.001f))              // continue à avancer en l’air
+          .AddPhase(new MovementPhase(0.4f, moveX: 1, dash: true))
+      //.AddPhase(new MovementPhase(0.5f)) //todo remove
+
+      ;  // ne pas bouger
+      action.CalculateCost();
+      //action.Condition = (pos, ai) => true; // on peux avancer dans le vide et depart dans le vide
+      action.Condition = (pos, ai) =>
+                                      agent.IsSolid(pos.X, pos.X + 16, pos.Y + 1)//sur sol
+                                      && agent.IsAreaFree(pos.X, pos.X + 16, pos.Y, pos.Y - 2)  //air libre pour sauté
+      ;
+      action.ResultPositions = (pos, ai) => new List<Point> {
+                                                new Point(pos.X + 16, pos.Y),
+      };
+      movementLibrary.Add(action);
+      /////////////////////// ok
       action = new MovementAction("jumpup")
          .AddPhase(new MovementPhase(0.5f, moveY: -1, jump: true)) // ne pas bouger
          //.AddPhase(new MovementPhase(0.0f, moveY: -1, jump: false)) // ne pas bouger
@@ -1153,7 +1351,12 @@ namespace TFModFortRiseAiGraph
                                                 new Point(pos.X, pos.Y - 13),
       };
       movementLibrary.Add(action);
+     
       /////////////////////// ok
+      /////////////////////// ok
+      /////////////////////// ok
+      /////////////////////// ok
+      movementLibrary.Add(action);
       return movementLibrary;
     }
   }
