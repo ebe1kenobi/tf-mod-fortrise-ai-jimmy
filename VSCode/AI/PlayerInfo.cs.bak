@@ -40,7 +40,6 @@ namespace TFModFortRiseAiGraph
       CanWallJump = false;
       Speed = Vector2.Zero;
       Facing = Facing.Right;
-      dodgeCooldown = false;
     }
   }
 

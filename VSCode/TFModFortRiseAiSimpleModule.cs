@@ -3,6 +3,7 @@ using System.Diagnostics;
 using FortRise;
 using Microsoft.Extensions.Logging;
 using TFModFortRiseLoaderAI;
+using Teuria.WiderSet;
 
 namespace TFModFortRiseAiGraph
 {
@@ -17,8 +18,12 @@ namespace TFModFortRiseAiGraph
         //typeof(MyVersusLevelSystem),
     ];
 
-    public static bool EightPlayerMod = false; //todo
+    public static bool EightPlayerMod = false; // vrai si le mod WiderSet est present (mode 8 joueurs disponible)
     public static bool PlayTagMod = false; //todo
+
+    // API WiderSet (dependance optionnelle) : null si le mod n'est pas installe.
+    // Remplace l'ancien EigthPlayerImport de FortRise 4.
+    public static IWiderSetModApi WiderSet;
 
 
     //public override Type SettingsType => typeof(TFModFortRiseAiSimpleSettings);
@@ -41,6 +46,9 @@ namespace TFModFortRiseAiGraph
       }
       //typeof(LoaderAIImport).ModInterop();
       LoaderAIModApi = context.Interop.GetApi<ILoaderAIModApi>("LoaderAI");
+      // Dependance optionnelle : GetApi renvoie null si WiderSet n'est pas installe.
+      WiderSet = context.Interop.GetApi<IWiderSetModApi>("Teuria.WiderSet");
+      EightPlayerMod = WiderSet != null;
     }
 
     //public override void LoadContent()

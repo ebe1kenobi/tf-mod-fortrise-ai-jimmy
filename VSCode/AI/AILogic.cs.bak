@@ -193,18 +193,18 @@ namespace TFModFortRiseAiGraph
 
     private void UpdateLevelGrid()
     {
-      // Mode WiderSet (8 joueurs) : le niveau est plus large -> la grille de
-      // pathfinding doit suivre. Remplace l'ancien EigthPlayerImport.IsEightPlayer().
-      if (WiderSetHelper.IsWide)
-      {
-        levelWidth = 42;
-        levelHeight = 24;
-      }
-      else
-      {
+      //if (EigthPlayerImport.IsEightPlayer())
+      //{
+      //  //Logger.Info("EigthPlayerImport.IsEightPlayer(): true : " + EigthPlayerImport.IsEightPlayer());
+      //  levelWidth = 42;
+      //  levelHeight = 24;
+      //}
+      //else
+      //{
+        //Logger.Info("EigthPlayerImport.IsEightPlayer(): false : " + EigthPlayerImport.IsEightPlayer());
         levelWidth = 32;
         levelHeight = 24;
-      }
+      //}
 
       if (levelGrid == null)
         levelGrid = new int[levelHeight, levelWidth];
@@ -352,7 +352,6 @@ namespace TFModFortRiseAiGraph
         }
 
         //test si ledgegrab ongoing (todo test)
-        /*
         if (playerInfo.GrabEdge &&
             (currentAction == null ||
             (currentAction.Name != "ledgegrableftout" && currentAction.Name != "ledgegrabrightout")))
@@ -375,7 +374,6 @@ namespace TFModFortRiseAiGraph
         {
           //Logger.Info("pas GrabEdge");
         }
-        */
 
         // === LANCER UNE NOUVELLE ACTION ===
         if (currentAction == null && currentActions.Count > 0)
