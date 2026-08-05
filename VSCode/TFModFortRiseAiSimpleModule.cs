@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using FortRise;
 using Microsoft.Extensions.Logging;
@@ -39,7 +39,7 @@ namespace TFModFortRiseAiGraph
         //Debugger.Launch(); // Proposera d’attacher Visual Studio
       }
       Instance = this;
-      TFModFortRiseAiGraph.Logger.Init("LOGAiJimmy");
+      TFModFortRiseAiGraph.Logger.Init(Meta.Name);
       foreach (var hookable in Hookables)
       {
         hookable.GetMethod(nameof(IHookable.Load))!.Invoke(null, [context.Harmony]);
