@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -193,21 +193,38 @@ namespace TFModFortRiseAiGraph
 
     private void UpdateLevelGrid()
     {
-      // Mode WiderSet (8 joueurs) : le niveau est plus large -> la grille de
-      // pathfinding doit suivre. Remplace l'ancien EigthPlayerImport.IsEightPlayer().
-      if (WiderSetHelper.IsWide)
+      // La taille de la grille se LIT sur le niveau, elle ne se devine plus.
+      //
+      // Elle etait choisie entre deux formats connus - 32x24, ou 42x24 quand WiderSet
+      // annonçait le mode large. Ca couvrait les deux cas prevus et aucun autre : un
+      // mode qui colle plusieurs niveaux (Scroll) en fait un de 64x48 ou davantage, et
+      // l'IA n'en voyait que le coin superieur gauche.
+      //
+      // Les tuiles du niveau portent la reponse exacte : leur grille de collision est
+      // faite de cases de dix pixels, comme celle-ci. Il n'y a donc rien a convertir,
+      // et rien a mettre a jour le jour ou un format de plus apparait.
+      Grid tiles = level?.Tiles?.Grid;
+
+      if (tiles != null)
       {
-        levelWidth = 42;
-        levelHeight = 24;
+        levelWidth = tiles.CellsX;
+        levelHeight = tiles.CellsY;
       }
       else
       {
-        levelWidth = 32;
+        levelWidth = WiderSetHelper.IsWide ? 42 : 32;
         levelHeight = 24;
       }
 
-      if (levelGrid == null)
+      // Reallouee des que le format change, et pas seulement la premiere fois : passer
+      // d'une manche normale a une manche large gardait sinon une grille de 32 de
+      // large alors que le code la parcourt sur 42.
+      if (levelGrid == null
+          || levelGrid.GetLength(0) != levelHeight
+          || levelGrid.GetLength(1) != levelWidth)
+      {
         levelGrid = new int[levelHeight, levelWidth];
+      }
 
       //Logger.Info("UpdateLevelGrid");
 
@@ -1336,12 +1353,31 @@ namespace TFModFortRiseAiGraph
       }
       else
       {
+        // En partie de chat, la cible n'est pas le joueur le plus proche mais CELUI
+        // QUI PORTE LE CHAT - et on ne va pas vers lui, on s'en eloigne (voir
+        // ChooseGoal). Sans cela l'IA jouait un deathmatch au milieu d'une partie de
+        // chat : elle fonçait sur le joueur le plus proche, y compris quand ce joueur
+        // etait justement celui qui la poursuivait.
+        int tagged = UpdateTagState();
+        UpdateSoccerState();
+
         foreach (Player p in level.Players)
         {
           if (p == null) continue;
           if (p.PlayerIndex == index) continue;     // ignorer soi-même
           if (p.Dead) continue;                     // ignorer joueurs morts/inactifs
           if (p.TeamColor != Allegiance.Neutral && p.TeamColor == player.TeamColor) continue; // ignorer joueurs meme team
+
+          if (tagged >= 0)
+          {
+            if (p.PlayerIndex == tagged)
+            {
+              enemy = p;
+              break;
+            }
+
+            continue;
+          }
 
           // distance en cases (Manhattan)
           Point pc = WorldToCell(p.Position);
@@ -1571,8 +1607,164 @@ namespace TFModFortRiseAiGraph
       return a.state == ArrowStates.Stuck || a.state == ArrowStates.LayingOnGround || a.state == ArrowStates.Buried;
     }
 
+    /// <summary>
+    /// Vrai quand l'IA doit FUIR sa cible au lieu de la rejoindre : partie de chat, et
+    /// c'est quelqu'un d'autre qui porte le chat.
+    ///
+    /// Quand c'est l'IA qui le porte, rien ne change - elle poursuit, ce qui est
+    /// exactement son comportement habituel.
+    /// </summary>
+    private bool fleeing;
+
+    /// <summary>
+    /// Relit l'etat de la partie de chat et rend l'index du joueur a fuir, ou -1.
+    ///
+    /// Appelee une fois par rafraichissement des informations, pas a chaque case du
+    /// chemin : l'interop traverse un proxy.
+    /// </summary>
+    /// <summary>
+    /// La case a rejoindre en match de foot, ou null hors de ce mode.
+    ///
+    /// Deux buts seulement, et ils se suivent : tant qu'on n'a pas le ballon on va le
+    /// chercher, une fois qu'on l'a on va au but d'en face. Le reste - courir, sauter,
+    /// esquiver - est le meme travail que d'habitude, il suffit de lui donner l'autre
+    /// destination.
+    /// </summary>
+    private Point? soccerGoal;
+
+    private void UpdateSoccerState()
+    {
+      soccerGoal = null;
+
+      if (!SoccerImport.IsSoccerMatch)
+      {
+        return;
+      }
+
+      // Porteur : direction le but adverse. Sinon : direction le ballon.
+      Microsoft.Xna.Framework.Vector2 target = SoccerImport.BallCarrier == index
+          ? SoccerImport.TargetGoal(index)
+          : SoccerImport.BallPosition;
+
+      if (target != Microsoft.Xna.Framework.Vector2.Zero)
+      {
+        soccerGoal = WorldToCell(target);
+      }
+    }
+
+    private int UpdateTagState()
+    {
+      fleeing = false;
+
+      if (!PlayTagImport.IsPlayTagMatch)
+      {
+        return -1;
+      }
+
+      int tagged = PlayTagImport.TaggedPlayer;
+
+      if (tagged < 0 || tagged == index)
+      {
+        // C'est l'IA qui porte le chat : elle chasse, et le joueur le plus proche
+        // reste la bonne cible.
+        return -1;
+      }
+
+      fleeing = true;
+      return tagged;
+    }
+
+    /// <summary>
+    /// La case la plus eloignee de la menace, parmi celles qu'on peut atteindre.
+    ///
+    /// Un but et non une direction : tout le reste de l'IA - A*, sauts, esquives -
+    /// travaille deja sur un but, et fuir n'est qu'un but choisi a l'envers. On
+    /// cherche dans un rayon plutot que dans tout le niveau, sans quoi elle
+    /// traverserait la carte en ligne droite et se ferait rattraper dans un coin.
+    /// </summary>
+    private Point FleeGoal(Point start, Point threat)
+    {
+      const int RANGE = 12;
+
+      Point best = start;
+      float bestScore = -1f;
+
+      for (int dx = -RANGE; dx <= RANGE; dx++)
+      {
+        for (int dy = -RANGE; dy <= RANGE; dy++)
+        {
+          int x = start.X + dx;
+          int y = start.Y + dy;
+
+          if (x < 0 || y < 0 || x >= levelWidth || y >= levelHeight) continue;
+          if (!IsCellWalkable(x, y) || IsDangerous(x, y)) continue;
+
+          // La distance a la menace compte, celle a parcourir aussi : une case deux
+          // fois plus loin de la menace mais a l'autre bout du niveau n'est pas un
+          // abri, c'est un voyage.
+          float away = Math.Abs(x - threat.X) + Math.Abs(y - threat.Y);
+          float cost = Math.Abs(dx) + Math.Abs(dy);
+          float score = away - cost * 0.25f;
+
+          if (score > bestScore)
+          {
+            bestScore = score;
+            best = new Point(x, y);
+          }
+        }
+      }
+
+      return best;
+    }
+
+    /// <summary>
+    /// Rabat un but sur une case ou l'on peut effectivement aller : la case demandee
+    /// elle-meme si elle convient, sinon la plus proche de ses voisines.
+    ///
+    /// Un ballon pose contre un mur, un but taille dans la pierre : le but brut n'est
+    /// pas toujours dans une case libre, et A* echouerait au lieu de s'en approcher.
+    /// </summary>
+    private Point Reachable(Point wanted, Point start)
+    {
+      if (wanted.X >= 0 && wanted.Y >= 0 && wanted.X < levelWidth && wanted.Y < levelHeight
+          && IsCellWalkable(wanted.X, wanted.Y) && !IsDangerous(wanted.X, wanted.Y))
+      {
+        return wanted;
+      }
+
+      var around = new List<Point>
+      {
+        new Point(wanted.X + 1, wanted.Y),
+        new Point(wanted.X - 1, wanted.Y),
+        new Point(wanted.X, wanted.Y + 1),
+        new Point(wanted.X, wanted.Y - 1)
+      };
+
+      var best = around
+        .Where(p => p.X >= 0 && p.Y >= 0 && p.X < levelWidth && p.Y < levelHeight
+                 && IsCellWalkable(p.X, p.Y) && !IsDangerous(p.X, p.Y))
+        .OrderBy(p => Math.Abs(p.X - start.X) + Math.Abs(p.Y - start.Y))
+        .FirstOrDefault();
+
+      return best.Equals(default(Point)) ? wanted : best;
+    }
+
     private Point ChooseGoal(Point start)
     {
+      // Fuir passe avant tout, y compris avant d'aller chercher des fleches : se faire
+      // toucher coute la manche, un carquois vide ne coute rien.
+      if (fleeing)
+      {
+        return FleeGoal(start, new Point(enemyInfo.X, enemyInfo.Y));
+      }
+
+      // En match de foot, il n'y a pas de fleches a ramasser ni d'ennemi a rejoindre :
+      // il y a le ballon, puis le but.
+      if (soccerGoal != null)
+      {
+        return Reachable(soccerGoal.Value, start);
+      }
+
       if (playerInfo.NbArrows <= 0)
       {
         var target = arrows

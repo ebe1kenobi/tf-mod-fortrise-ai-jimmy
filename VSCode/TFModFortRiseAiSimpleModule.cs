@@ -39,7 +39,7 @@ namespace TFModFortRiseAiGraph
         //Debugger.Launch(); // Proposera d’attacher Visual Studio
       }
       Instance = this;
-      TFModFortRiseAiGraph.Logger.Init(Meta.Name);
+      TFModFortRiseAiGraph.Logger.Init(logger);
       foreach (var hookable in Hookables)
       {
         hookable.GetMethod(nameof(IHookable.Load))!.Invoke(null, [context.Harmony]);
@@ -49,6 +49,13 @@ namespace TFModFortRiseAiGraph
       // Dependance optionnelle : GetApi renvoie null si WiderSet n'est pas installe.
       WiderSet = context.Interop.GetApi<IWiderSetModApi>("Teuria.WiderSet");
       EightPlayerMod = WiderSet != null;
+
+      // PlayTag se resout PLUS TARD, au premier besoin. Ces deux-la se resolvent ici
+      // et cela marche - un mod charge avant nous est bien joignable depuis notre
+      // constructeur - mais cela depend de l'ordre de chargement, qui change des
+      // qu'on installe ou retire un mod. Voir PlayTagImport.
+      PlayTagImport.Bind(context.Interop);
+      SoccerImport.Bind(context.Interop);
     }
 
     //public override void LoadContent()

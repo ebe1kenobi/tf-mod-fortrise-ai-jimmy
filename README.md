@@ -46,6 +46,52 @@ player name as soon as at least one agent is available.
 In short: **NumPad 1-8** assigns an agent to the matching player, **F1-F8** removes
 it.
 
+## What Jimmy knows about the mode it is in
+
+The AI used to play the same game whatever the mode: chase the nearest player, shoot
+at it. That is deathmatch, and it is wrong everywhere else.
+
+### Play tag
+
+When the **PlayTag** mod is installed and a tag match is running, Jimmy targets the
+player who is **it** and **runs from them** instead of closing in. When Jimmy is the
+one carrying the tag, nothing changes - it chases, which is exactly its usual
+behaviour.
+
+Fleeing takes priority over fetching arrows: being touched costs the round, an empty
+quiver costs nothing. The goal it walks to is the cell furthest from the threat within
+a radius of twelve, weighted by the distance it would have to travel - a cell twice as
+far from the chaser but across the map is not a shelter, it is a journey.
+
+### Soccer
+
+When the **Soccer** mod is running, Jimmy goes for the ball, then for the opposite
+goal once it carries it. Running, jumping and dodging are the same work as always -
+only the destination changes.
+
+### Wide levels, stitched levels
+
+The pathfinding grid used to be **guessed** between two known formats: 32x24, or 42x24
+when WiderSet announced wide mode. That covered the two cases it was written for and
+no other - a mode that stitches several levels together (Scroll) makes one 64x48 or
+larger, and the AI only saw its top-left corner.
+
+It is now **read** off `level.Tiles.Grid`: the level's own collision grid is made of
+ten-pixel cells, exactly like the pathfinding one, so there is nothing to convert and
+nothing to update the day another format appears. The array is also reallocated when
+the format changes, and not only the first time - going from a normal round to a wide
+one used to keep a 32-wide grid while the code walked it over 42.
+
+That does not make Jimmy a good Scroll player: it still does not know that the screen
+scrolls and that it has to keep up. But it is no longer blind.
+
+### Optional, both ways
+
+PlayTag and Soccer are optional dependencies resolved **on first use** rather than in
+the constructor. A mod loaded before us is reachable from there - WiderSet loads 4th,
+Jimmy 28th - but that depends on load order, which changes the moment a mod is added
+or removed. Without those mods everything answers "no" and Jimmy behaves as before.
+
 ## Build / deployment
 
 | Script | Purpose |
