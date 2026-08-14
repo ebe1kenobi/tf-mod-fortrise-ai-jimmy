@@ -16,7 +16,7 @@ namespace TFModFortRiseAiGraph
 {
   public class AILogic : ILoaderAIModApi.IAgentLogic
   {
-    public string Type => "AIJIMMY";
+    public string Type => "JIMMY";
 
     private Level level;
     private int index;
