@@ -28,6 +28,8 @@ Data and log files live in `<TowerFall>/FortRise/Saves/AIJimmy/` and `<TowerFall
 Install **LoaderAI** first, then this mod. The "Jimmy" agent then shows up in the
 list of available AIs on the archer select screen.
 
+<img width="964" height="678" alt="image" src="https://github.com/user-attachments/assets/eda1e0c8-b29c-4383-88d9-9f17de0f9ec8" />
+
 ### AI keyboard layout
 
 An AI is picked on the archer select screen: up and down arrows appear around the
