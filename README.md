@@ -1,5 +1,7 @@
 # AIJimmy
 
+<img width="640" height="400" alt="headhunters_101257_round_00" src="https://github.com/user-attachments/assets/fd11609d-3d35-41cf-968c-c8ada5892fc2" />
+
 An AI for the **LoaderAI** loader. Not machine learning, just a set of rules, but
 noticeably nicer to play against than the simple or Python AIs, with fairly
 human-like behaviour.
@@ -22,6 +24,7 @@ A mod for **FortRise 5** (>= 5.3.3). The FortRise 4 version (`tf-mod-fortrise-ai
 
 Settings are under **Options > Mods > AIJimmy**.
 Data and log files live in `<TowerFall>/FortRise/Saves/AIJimmy/` and `<TowerFall>/FortRise/Logs/`.
+
 
 ## Usage
 
