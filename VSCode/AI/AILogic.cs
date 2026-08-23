@@ -129,8 +129,27 @@ namespace TFModFortRiseAiGraph
 
     public System.Collections.Generic.List<int> Update()
     {
-      //Logger.Info($"SimpleAILogic.Update  {index}");
-      // your Move() code goes here
+      // **Rien pendant le gel d'avant-manche.**
+      //
+      // Le jeu met les archers dans l'etat Frozen pendant le decompte : ils ne bougent
+      // pas, mais ce gel ne concerne que LEUR update. Nos actions, elles, continuaient
+      // d'etre calculees et poussees - on voyait donc l'IA s'agiter derriere le
+      // decompte alors que les humains attendaient.
+      //
+      // On rend la liste d'actions VIDE plutot que de sortir : le contrat de l'API est
+      // un tableau, et tout a zero veut dire "rien de demande".
+      Player self = level?.GetPlayer(index);
+
+      if (self != null && self.State == Player.PlayerStates.Frozen)
+      {
+        for (int i = 0; i < actions.Count; i++)
+        {
+          actions[i] = 0;
+        }
+
+        return actions;
+      }
+
       return Move();
     }
 
