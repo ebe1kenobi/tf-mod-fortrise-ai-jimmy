@@ -40,16 +40,20 @@ player name as soon as at least one agent is available.
 
 | Action | P1 | P2 | P3 | P4 | P5 | P6 | P7 | P8 |
 |--------|----|----|----|----|----|----|----|----|
-| Down | A | Z | D | F | G | H | J | K |
-| Up | Q | S | E | R | T | Y | U | I |
+| Down | Q | S | D | F | G | H | J | K |
+| Up | A | Z | E | R | T | Y | U | I |
 | Left | O | P | W | C | B | F9 | F11 | Page Up |
 | Right | L | M | X | V | N | F10 | F12 | Page Down |
-| Jump / **pick the AI** | NumPad1 | NumPad2 | NumPad3 | NumPad4 | NumPad5 | NumPad6 | NumPad7 | NumPad8 |
+| Jump / **pick the AI** | NumPad1 or 1 | NumPad2 or 2 | NumPad3 or 3 | NumPad4 or 4 | NumPad5 or 5 | NumPad6 or 6 | NumPad7 or 7 | NumPad8 or 8 |
 | Shoot / **drop the AI** | F1 | F2 | F3 | F4 | F5 | F6 | F7 | F8 |
-| Dodge | F13 | F14 | F15 | F16 | F17 | F18 | F19 | F20 |
+| Dodge / **alt costume** | F13 | F14 | F15 | F16 | F17 | F18 | F19 | F20 |
 
-In short: **NumPad 1-8** assigns an agent to the matching player, **F1-F8** removes
-it.
+In short: **1-8** assigns an agent to the matching player - the top row or the number pad,
+either works - and **F1-F8** removes it. The table is owned by LoaderAI, which also writes
+these key names straight onto the portrait of any slot an AI is holding.
+
+> The first two columns used to be printed the wrong way round here: P1 is `Q` down and
+> `A` up, P2 is `S` down and `Z` up. From P3 onwards the pairs read as they always did.
 
 ## What Jimmy knows about the mode it is in
 
@@ -89,6 +93,15 @@ one used to keep a 32-wide grid while the code walked it over 42.
 
 That does not make Jimmy a good Scroll player: it still does not know that the screen
 scrolls and that it has to keep up. But it is no longer blind.
+
+### It waits for the countdown
+
+The game puts archers in the `Frozen` state during the pre-round countdown. That freeze
+only governs **their** update: Jimmy's actions went on being computed and pushed the whole
+time, so you could watch the AI fidget behind the countdown while the humans stood still.
+
+It now returns an **empty** action list in that state rather than bailing out early: the
+loader's contract is an array, and all-zero is how you say "nothing requested".
 
 ### Optional, both ways
 
